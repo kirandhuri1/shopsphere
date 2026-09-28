@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cart — ShopSphere</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="index.html">Shop<span>Sphere</span></a>
+      <nav class="nav">
+        <a href="category.html?cat=Outerwear">Outerwear</a>
+        <a href="category.html?cat=Footwear">Footwear</a>
+        <a href="category.html?cat=Accessories">Accessories</a>
+        <a class="cart-link" href="cart.html">
+          Cart <span class="badge" data-cart-badge>0</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="wrap" style="max-width:720px;">
+      <div class="section-head">
+        <h2>Your cart</h2>
+      </div>
+      <div id="cart-lines"></div>
+      <div id="cart-summary"></div>
+
+      <!-- Zone: cart-upsell — Phase 4, Decision #2 (idle-on-cart exit-intent
+           offer). Rendered here as a simple inline banner for now. -->
+      <div id="zone-cart-upsell" style="margin-top:20px;"></div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="wrap">ShopSphere — demo storefront for learning Salesforce Marketing Cloud Personalization.</div>
+  </footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/site.js"></script>
+  <script>
+    function renderCart() {
+      const cart = getCart();
+      const linesEl = document.getElementById("cart-lines");
+      const summaryEl = document.getElementById("cart-summary");
+
+      if (cart.length === 0) {
+        linesEl.innerHTML = '<div class="empty-state"><h2>Your cart is empty</h2><p><a class="btn" href="index.html">Keep shopping</a></p></div>';
+        summaryEl.innerHTML = "";
+        return;
+      }
+
+      linesEl.innerHTML = cart
+        .map((line) => {
+          const p = getProductById(line.productId);
+          if (!p) return "";
+          return `
+            <div class="cart-line">
+              ${productSwatch(p)}
+              <div>
+                <h4>${p.name}</h4>
+                <p class="muted">${money(p.price)} · SKU ${p.id}</p>
+              </div>
+              <input type="number" min="1" value="${line.qty}" style="width:56px;padding:6px;border:1px solid var(--paper-line);border-radius:3px;text-align:center;" data-qty-for="${p.id}" />
+              <button class="btn btn--secondary btn--sm" data-remove="${p.id}">Remove</button>
+            </div>
+          `;
+        })
+        .join("");
+
+      summaryEl.innerHTML = `
+        <div class="cart-summary">
+          <span>Subtotal</span>
+          <span>${money(cartTotal())}</span>
+        </div>
+        <button class="btn" id="checkout-btn" style="width:100%;margin-top:16px;">Checkout</button>
+      `;
+
+      linesEl.querySelectorAll("[data-qty-for]").forEach((input) => {
+        input.addEventListener("change", (e) => {
+          setQty(e.target.getAttribute("data-qty-for"), parseInt(e.target.value, 10) || 1);
+          renderCart();
+        });
+      });
+      linesEl.querySelectorAll("[data-remove]").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          removeFromCart(e.target.getAttribute("data-remove"));
+          renderCart();
+        });
+      });
+
+      document.getElementById("checkout-btn").addEventListener("click", () => {
+        // Phase 3, event #4: purchase. In the real project this fires on an
+        // actual checkout confirmation page — simplified here to one click.
+        trackEvent("purchase", {
+          orderTotal: cartTotal(),
+          items: cart.map((l) => ({ productId: l.productId, qty: l.qty })),
+        });
+        saveCart([]);
+        alert("Order placed! (This is a demo — no real checkout.) Check the console for the purchase event.");
+        renderCart();
+      });
+    }
+
+    // Phase 4, Decision #2: if the cart has items, show an idle-triggered
+    // upsell after 30s on this page. A real MCP campaign would target this
+    // by rule/audience instead of a hardcoded timer.
+    if (getCart().length > 0) {
+      setTimeout(() => {
+        document.getElementById("zone-cart-upsell").innerHTML = `
+          <div class="cat-card">
+            <span class="zone-marker">zone: cart-upsell</span>
+            <h3>Still deciding?</h3>
+            <p>Take 10% off Accessories if you check out in the next 15 minutes.</p>
+          </div>
+        `;
+      }, 30000);
+    }
+
+    renderCart();
+  </script>
+</body>
+</html>

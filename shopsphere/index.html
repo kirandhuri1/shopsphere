@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShopSphere — Gear for the terrain ahead</title>
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!--
+    Phase 3 (MCP Web SDK): the vendor snippet goes here, before </head>.
+    Something like:
+      <script src="https://cXXXXX.evergage.com/beacon/YOUR_ACCOUNT/scripts/evergage.min.js"></script>
+    Check your MCP account's "Web SDK install" page for the exact snippet —
+    it includes your account/dataset IDs.
+  -->
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="index.html">Shop<span>Sphere</span></a>
+      <nav class="nav">
+        <a href="category.html?cat=Outerwear">Outerwear</a>
+        <a href="category.html?cat=Footwear">Footwear</a>
+        <a href="category.html?cat=Accessories">Accessories</a>
+        <a class="cart-link" href="cart.html">
+          Cart <span class="badge" data-cart-badge>0</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <h1>Gear built for the terrain ahead.</h1>
+        <p>Shells, boots and the small stuff that actually gets used — tested on real trail, sold without the marketing fluff.</p>
+        <a class="btn" href="category.html?cat=Outerwear">Shop Outerwear</a>
+      </div>
+      <!-- Zone: homepage-hero — a rule-based campaign (Phase 4, Decision #1)
+           can override this whole block for a targeted visitor. -->
+      <div class="hero-tiles" id="zone-homepage-hero">
+        <div class="hero-tile hero-tile--1">Outerwear</div>
+        <div class="hero-tile hero-tile--2">Footwear</div>
+        <div class="hero-tile hero-tile--3">Accessories</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Shop by category</h2>
+      </div>
+      <div class="cat-strip">
+        <a class="cat-card" href="category.html?cat=Outerwear">
+          <h3>Outerwear</h3>
+          <p>Shells, insulation, fleece</p>
+        </a>
+        <a class="cat-card" href="category.html?cat=Footwear">
+          <h3>Footwear</h3>
+          <p>Trail runners, boots, camp shoes</p>
+        </a>
+        <a class="cat-card" href="category.html?cat=Accessories">
+          <h3>Accessories</h3>
+          <p>Packs, socks, the small stuff</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Recommended for you</h2>
+      </div>
+      <!-- Zone: homepage-recs — Phase 4, Decision #3 (Einstein "Recommended
+           for You"). Until that's built, we fill it with a static pick. -->
+      <span class="zone-marker">zone: homepage-recs</span>
+      <div class="grid" id="homepage-recs"></div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="wrap">ShopSphere — demo storefront for learning Salesforce Marketing Cloud Personalization.</div>
+  </footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/site.js"></script>
+  <script>
+    // Placeholder for the homepage-recs zone: 4 products, mixed categories.
+    // Swap this block out in Phase 5 once the real Einstein campaign exists.
+    const recs = PRODUCTS.slice(0, 4);
+    document.getElementById("homepage-recs").innerHTML = recs.map(productCard).join("");
+  </script>
+</body>
+</html>

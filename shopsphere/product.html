@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Product — ShopSphere</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="index.html">Shop<span>Sphere</span></a>
+      <nav class="nav">
+        <a href="category.html?cat=Outerwear">Outerwear</a>
+        <a href="category.html?cat=Footwear">Footwear</a>
+        <a href="category.html?cat=Accessories">Accessories</a>
+        <a class="cart-link" href="cart.html">
+          Cart <span class="badge" data-cart-badge>0</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="pdp" id="pdp"></div>
+
+    <div class="section" style="padding-top:0">
+      <div class="section-head">
+        <h2>You might also like</h2>
+      </div>
+      <!-- Zone: pdp-recs — Phase 4, Decision #4 (Einstein "Similar Items" /
+           "Frequently Bought Together"). Static same-category pick for now. -->
+      <span class="zone-marker">zone: pdp-recs</span>
+      <div class="grid" id="pdp-recs"></div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="wrap">ShopSphere — demo storefront for learning Salesforce Marketing Cloud Personalization.</div>
+  </footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/site.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const product = getProductById(params.get("id"));
+    const pdp = document.getElementById("pdp");
+
+    if (!product) {
+      pdp.innerHTML = '<div class="empty-state"><h2>Product not found</h2><p><a class="btn btn--secondary" href="index.html">Back to home</a></p></div>';
+    } else {
+      pdp.innerHTML = `
+        ${productSwatch(product)}
+        <div class="pdp-info">
+          <p class="card__brand">${product.brand}</p>
+          <h1>${product.name}</h1>
+          <p class="price">${product.sale ? '<span class="tag">Sale</span> ' : ""}${money(product.price)}</p>
+          <p class="desc">${product.description}</p>
+          <div class="qty-row">
+            <label for="qty">Qty</label>
+            <input type="number" id="qty" value="1" min="1" />
+          </div>
+          <button class="btn" id="add-btn">Add to cart</button>
+          <p class="muted" style="margin-top:10px;color:var(--muted);font-size:0.85rem;">SKU ${product.id}</p>
+        </div>
+      `;
+
+      // Phase 3, event #2: viewItem. This is the single most important
+      // event in the whole project — it's what Einstein recs are built on.
+      trackEvent("viewItem", {
+        productId: product.id,
+        category: product.category,
+        price: product.price,
+      });
+
+      document.getElementById("add-btn").addEventListener("click", () => {
+        const qty = parseInt(document.getElementById("qty").value, 10) || 1;
+        addToCart(product.id, qty);
+        document.getElementById("add-btn").textContent = "Added ✓";
+        setTimeout(() => (document.getElementById("add-btn").textContent = "Add to cart"), 1200);
+      });
+
+      const related = getRelatedProducts(product);
+      document.getElementById("pdp-recs").innerHTML = related.map(productCard).join("");
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shop — ShopSphere</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="index.html">Shop<span>Sphere</span></a>
+      <nav class="nav">
+        <a href="category.html?cat=Outerwear">Outerwear</a>
+        <a href="category.html?cat=Footwear">Footwear</a>
+        <a href="category.html?cat=Accessories">Accessories</a>
+        <a class="cart-link" href="cart.html">
+          Cart <span class="badge" data-cart-badge>0</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="cat-title">Shop</h2>
+      </div>
+      <div class="grid" id="product-grid"></div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="wrap">ShopSphere — demo storefront for learning Salesforce Marketing Cloud Personalization.</div>
+  </footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/site.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const cat = params.get("cat") || "All";
+    const products = cat === "All" ? PRODUCTS : getProductsByCategory(cat);
+
+    document.getElementById("cat-title").textContent = cat === "All" ? "All Products" : cat;
+    document.getElementById("product-grid").innerHTML = products.map(productCard).join("");
+
+    // Phase 3, event #3: viewCategory. Payload should be enough for MCP to
+    // build "visitors who browsed Footwear" audiences downstream.
+    trackEvent("viewCategory", { category: cat, resultCount: products.length });
+  </script>
+</body>
+</html>
